@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Cost Segregation Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            transition: width 0.5s ease;
+        }
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 40px 0;
+        }
+        .info-box {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .success-box {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .animated-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #059669;
+            transition: all 0.5s ease;
+        }
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 24px;
+            background: white;
+            border-radius: 0 8px 8px 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .property-icon {
+            font-size: 2rem;
+            margin-right: 12px;
+            color: #3b82f6;
+        }
+        .savings-highlight {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 24px 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .component-breakdown {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 32px;
+            margin: 16px 0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            width: 2px;
+            height: 40px;
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-4">
+                    <i class="fas fa-building mr-3"></i>
+                    Advanced AI Cost Segregation Analyzer
+                </h1>
+                <p class="text-xl opacity-90 mb-6">
+                    Comprehensive Property Analysis • Multiple Scenarios • Professional Insights
+                </p>
+                <div class="flex justify-center space-x-8 text-sm">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        AI-Powered Analysis
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        Visual Comparisons
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i>
+                        Professional Reports
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Property Input Section -->
+        <section class="mb-12">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-home property-icon"></i>
+                    Property Information
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                        <select id="propertyType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Property Type</option>
+                            <option value="office">Commercial Office Building</option>
+                            <option value="retail">Retail Space</option>
+                            <option value="multifamily">Multifamily Residential</option>
+                            <option value="warehouse">Warehouse/Industrial</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="hotel">Hotel/Hospitality</option>
+                            <option value="medical">Medical Office</option>
+                            <option value="manufacturing">Manufacturing Facility</option>
+                            <option value="mixed">Mixed-Use Development</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Purchase Price</label>
+                        <input type="number" id="purchasePrice" placeholder="e.g., 2500000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Land Value</label>
+                        <input type="number" id="landValue" placeholder="e.g., 500000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Year Placed in Service</label>
+                        <select id="yearInService" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Year</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Property State</label>
+                        <select id="propertyState" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select State</option>
+                            <option value="CA">California</option>
+                            <option value="NY">New York</option>
+                            <option value="TX">Texas</option>
+                            <option value="FL">Florida</option>
+                            <option value="IL">Illinois</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Building Square Footage</label>
+                        <input type="number" id="squareFootage" placeholder="e.g., 25000" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Federal Tax Rate (%)</label>
+                        <select id="taxRate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Tax Rate</option>
+                            <option value="37">37% (Highest)</option>
+                            <option value="35">35%</option>
+                            <option value="32">32%</option>
+                            <option value="24">24%</option>
+                            <option value="22">22%</option>
+                            <option value="21">21% (Corporate)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">State Tax Rate (%)</label>
+                        <input type="number" id="stateTaxRate" placeholder="e.g., 13.3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <button onclick="performAnalysis()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all font-medium">
+                        <i class="fas fa-calculator mr-2"></i>
+                        Analyze Property
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educational Section -->
+        <section class="mb-12">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-graduation-cap mr-3 text-blue-600"></i>
+                    Understanding Cost Segregation
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">What is Cost Segregation?</h3>
+                        <p class="text-gray-600 mb-4">
+                            Cost segregation is a tax strategy that separates the components of a building into different depreciation categories, allowing property owners to accelerate depreciation deductions and reduce current tax liability.
+                        </p>
+                        <p class="text-gray-600 mb-4">
+                            Instead of depreciating the entire building over 27.5 years (residential) or 39 years (commercial), cost segregation identifies components that can be depreciated over 5, 7, or 15 years.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">Key Benefits</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Immediate tax savings through accelerated depreciation</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Improved cash flow from reduced tax payments</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">100% bonus depreciation for eligible components</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">IRS-approved tax strategy with audit protection</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4 class="font-semibold text-blue-800 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Bonus Depreciation Opportunity
+                    </h4>
+                    <p class="text-blue-700">
+                        The Tax Cuts and Jobs Act allows 100% bonus depreciation for qualified property placed in service from September 27, 2017, through December 31, 2022. This means you can deduct the full cost of 5, 7, and 15-year property components in the first year!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="mb-12 hidden">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-chart-bar mr-3 text-green-600"></i>
+                    Cost Segregation Analysis Results
+                </h2>
+                
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="metric-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Depreciable Basis</h3>
+                        <div id="depreciableBasis" class="animated-number">$0</div>
+                        <p class="text-sm text-gray-600">Purchase Price - Land Value</p>
+                    </div>
+                    
+                    <div class="metric-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">First-Year Accelerated Deduction</h3>
+                        <div id="firstYearDeduction" class="animated-number">$0</div>
+                        <p class="text-sm text-gray-600">5/7-Year + 15-Year Components</p>
+                    </div>
+                    
+                    <div class="metric-card text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Estimated Tax Savings</h3>
+                        <div id="taxSavings" class="animated-number">$0</div>
+                        <p class="text-sm text-gray-600">Federal + State Combined</p>
+                    </div>
+                </div>
+                
+                <!-- Savings Highlight -->
+                <div class="savings-highlight">
+                    <h3 class="text-2xl font-bold mb-4">Your Potential Tax Savings</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Year 1 Savings</h4>
+                            <div id="year1Savings" class="text-4xl font-bold">$0</div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">5-Year Cumulative Savings</h4>
+                            <div id="cumulativeSavings" class="text-4xl font-bold">$0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Component Breakdown Chart -->
+                <div class="chart-container">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">Depreciation Component Breakdown</h3>
+                    <canvas id="componentChart"></canvas>
+                </div>
+                
+                <!-- Comparison Chart -->
+                <div class="chart-container">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">Cost Segregation vs. Traditional Depreciation</h3>
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Property-Specific Analysis -->
+        <section id="propertyAnalysis" class="mb-12 hidden">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-search mr-3 text-purple-600"></i>
+                    Property-Specific Analysis
+                </h2>
+                
+                <div class="tabs">
+                    <div class="flex space-x-1 mb-4">
+                        <button class="tab-button active" onclick="showTab('components')">Component Analysis</button>
+                        <button class="tab-button" onclick="showTab('scenarios')">Scenarios</button>
+                        <button class="tab-button" onclick="showTab('timeline')">Timeline</button>
+                        <button class="tab-button" onclick="showTab('roi')">ROI Analysis</button>
+                    </div>
+                    
+                    <div id="components" class="tab-content active">
+                        <h3 class="text-lg font-semibold mb-4">Typical Components for Your Property Type</h3>
+                        <div id="componentBreakdown"></div>
+                    </div>
+                    
+                    <div id="scenarios" class="tab-content">
+                        <h3 class="text-lg font-semibold mb-4">Multiple Depreciation Scenarios</h3>
+                        <div class="comparison-grid">
+                            <div class="metric-card">
+                                <h4 class="font-semibold text-gray-700 mb-3">Conservative Scenario (15% Components)</h4>
+                                <div id="conservativeScenario"></div>
+                            </div>
+                            <div class="metric-card">
+                                <h4 class="font-semibold text-gray-700 mb-3">Aggressive Scenario (35% Components)</h4>
+                                <div id="aggressiveScenario"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="timeline" class="tab-content">
+                        <h3 class="text-lg font-semibold mb-4">Optimal Timing Strategy</h3>
+                        <div id="timelineAnalysis"></div>
+                    </div>
+                    
+                    <div id="roi" class="tab-content">
+                        <h3 class="text-lg font-semibold mb-4">Return on Investment Analysis</h3>
+                        <div id="roiAnalysis"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Professional Report -->
+        <section id="reportSection" class="mb-12 hidden">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-file-alt mr-3 text-indigo-600"></i>
+                    Professional Report Summary
+                </h2>
+                
+                <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-4">Executive Summary</h3>
+                    <div id="executiveSummary" class="text-gray-700"></div>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-4">Detailed Analysis</h3>
+                    <div id="detailedAnalysis" class="text-gray-700"></div>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-4">Recommendations</h3>
+                    <div id="recommendations" class="text-gray-700"></div>
+                </div>
+                
+                <div class="warning-box">
+                    <h4 class="font-semibold text-yellow-800 mb-2">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Important Disclaimer
+                    </h4>
+                    <p class="text-yellow-700">
+                        This analysis is based on general assumptions and industry averages. A formal cost segregation study by a qualified professional is required for actual tax filings. Results may vary based on specific property conditions and tax circumstances.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section id="nextSteps" class="mb-12 hidden">
+            <div class="bg-white rounded-xl card-shadow p-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                    <i class="fas fa-arrow-right mr-3 text-blue-600"></i>
+                    Next Steps & Resources
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">Immediate Actions</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Share this analysis with your CPA or tax advisor</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Request a formal cost segregation study proposal</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Gather construction documents and invoices</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Consider timing for maximum tax benefit</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">Study Requirements</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-document text-blue-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Property purchase agreements</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-document text-blue-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Construction contracts and invoices</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-document text-blue-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Architectural plans and specifications</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-document text-blue-600 mt-1 mr-3"></i>
+                                <span class="text-gray-600">Property appraisals</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="success-box">
+                    <h4 class="font-semibold text-green-800 mb-2">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Pro Tip
+                    </h4>
+                    <p class="text-green-700">
+                        Cost segregation studies typically pay for themselves 10-100 times over in tax savings. The earlier you complete the study after property acquisition, the greater the benefit due to time value of money.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-4">Advanced AI Cost Segregation Analyzer</p>
+            <p class="text-gray-400 text-sm">
+                This tool provides preliminary estimates based on industry averages. 
+                Consult with qualified tax professionals for formal cost segregation studies.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let componentChart;
+        let comparisonChart;
+        let analysisData = {};
+
+        function performAnalysis() {
+            // Get input values
+            const propertyType = document.getElementById('propertyType').value;
+            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value) || 0;
+            const landValue = parseFloat(document.getElementById('landValue').value) || 0;
+            const yearInService = document.getElementById('yearInService').value;
+            const propertyState = document.getElementById('propertyState').value;
+            const squareFootage = parseFloat(document.getElementById('squareFootage').value) || 0;
+            const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+            const stateTaxRate = parseFloat(document.getElementById('stateTaxRate').value) || 0;
+
+            // Validate inputs
+            if (!propertyType || !purchasePrice || !landValue || !yearInService || !taxRate) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Calculate depreciable basis
+            const depreciableBasis = purchasePrice - landValue;
+
+            // Property-specific allocation percentages
+            const allocations = getPropertyAllocations(propertyType);
+
+            // Calculate component values
+            const fiveSevenYear = depreciableBasis * allocations.fiveSevenYear;
+            const fifteenYear = depreciableBasis * allocations.fifteenYear;
+            const thirtyNineYear = depreciableBasis * allocations.thirtyNineYear;
+
+            // Calculate first-year deduction (with bonus depreciation for 2023)
+            let firstYearDeduction;
+            if (yearInService === '2023') {
+                firstYearDeduction = fiveSevenYear + fifteenYear; // 100% bonus
+            } else {
+                firstYearDeduction = fiveSevenYear * 0.2 + fifteenYear * 0.0667; // Regular depreciation
+            }
+
+            // Calculate tax savings
+            const federalSavings = firstYearDeduction * (taxRate / 100);
+            const stateSavings = firstYearDeduction * (stateTaxRate / 100);
+            const totalSavings = federalSavings + stateSavings;
+
+            // Store analysis data
+            analysisData = {
+                propertyType,
+                purchasePrice,
+                landValue,
+                depreciableBasis,
+                yearInService,
+                propertyState,
+                squareFootage,
+                taxRate,
+                stateTaxRate,
+                fiveSevenYear,
+                fifteenYear,
+                thirtyNineYear,
+                firstYearDeduction,
+                federalSavings,
+                stateSavings,
+                totalSavings,
+                allocations
+            };
+
+            // Update display
+            updateResults();
+            updatePropertyAnalysis();
+            updateReport();
+            updateNextSteps();
+
+            // Show results sections
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('propertyAnalysis').classList.remove('hidden');
+            document.getElementById('reportSection').classList.remove('hidden');
+            document.getElementById('nextSteps').classList.remove('hidden');
+
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function getPropertyAllocations(propertyType) {
+            const allocations = {
+                'office': { fiveSevenYear: 0.20, fifteenYear: 0.10, thirtyNineYear: 0.70 },
+                'retail': { fiveSevenYear: 0.25, fifteenYear: 0.15, thirtyNineYear: 0.60 },
+                'multifamily': { fiveSevenYear: 0.15, fifteenYear: 0.10, thirtyNineYear: 0.75 },
+                'warehouse': { fiveSevenYear: 0.18, fifteenYear: 0.12, thirtyNineYear: 0.70 },
+                'restaurant': { fiveSevenYear: 0.35, fifteenYear: 0.15, thirtyNineYear: 0.50 },
+                'hotel': { fiveSevenYear: 0.30, fifteenYear: 0.15, thirtyNineYear: 0.55 },
+                'medical': { fiveSevenYear: 0.25, fifteenYear: 0.10, thirtyNineYear: 0.65 },
+                'manufacturing': { fiveSevenYear: 0.22, fifteenYear: 0.18, thirtyNineYear: 0.60 },
+                'mixed': { fiveSevenYear: 0.22, fifteenYear: 0.12, thirtyNineYear: 0.66 }
+            };
+            return allocations[propertyType] || { fiveSevenYear: 0.20, fifteenYear: 0.10, thirtyNineYear: 0.70 };
+        }
+
+        function updateResults() {
+            const data = analysisData;
+            
+            // Update summary cards
+            document.getElementById('depreciableBasis').textContent = formatCurrency(data.depreciableBasis);
+            document.getElementById('firstYearDeduction').textContent = formatCurrency(data.firstYearDeduction);
+            document.getElementById('taxSavings').textContent = formatCurrency(data.totalSavings);
+            document.getElementById('year1Savings').textContent = formatCurrency(data.totalSavings);
+            document.getElementById('cumulativeSavings').textContent = formatCurrency(data.totalSavings * 1.5);
+
+            // Create component breakdown chart
+            createComponentChart();
+            
+            // Create comparison chart
+            createComparisonChart();
+        }
+
+        function createComponentChart() {
+            const ctx = document.getElementById('componentChart').getContext('2d');
+            
+            if (componentChart) {
+                componentChart.destroy();
+            }
+
+            componentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['5/7-Year Property', '15-Year Property', '39-Year Building'],
+                    datasets: [{
+                        data: [
+                            analysisData.fiveSevenYear,
+                            analysisData.fifteenYear,
+                            analysisData.thirtyNineYear
+                        ],
+                        backgroundColor: ['#10b981', '#3b82f6', '#6b7280'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const percentage = ((value / analysisData.depreciableBasis) * 100).toFixed(1);
+                                    return context.label + ': ' + formatCurrency(value) + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createComparisonChart() {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+
+            // Calculate traditional depreciation
+            const traditionaYears = analysisData.propertyType === 'multifamily' ? 27.5 : 39;
+            const traditionalAnnual = analysisData.depreciableBasis / traditionaYears;
+            
+            // Calculate 5-year projections
+            const years = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
+            const costSegData = [];
+            const traditionalData = [];
+            
+            for (let i = 0; i < 5; i++) {
+                if (i === 0) {
+                    costSegData.push(analysisData.firstYearDeduction);
+                } else {
+                    costSegData.push(analysisData.thirtyNineYear / traditionaYears);
+                }
+                traditionalData.push(traditionalAnnual);
+            }
+
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Cost Segregation',
+                        data: costSegData,
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1
+                    }, {
+                        label: 'Traditional Depreciation',
+                        data: traditionalData,
+                        backgroundColor: '#6b7280',
+                        borderColor: '#4b5563',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePropertyAnalysis() {
+            updateComponentBreakdown();
+            updateScenarios();
+            updateTimeline();
+            updateROI();
+        }
+
+        function updateComponentBreakdown() {
+            const components = getPropertyComponents(analysisData.propertyType);
+            const breakdownHtml = components.map(component => `
+                <div class="component-breakdown">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-semibold text-gray-700">${component.name}</h4>
+                        <span class="text-sm text-gray-600">${component.years}-Year Property</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">${component.description}</p>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Typical Allocation: ${component.percentage}%</span>
+                        <span class="font-semibold text-green-600">${formatCurrency(analysisData.depreciableBasis * component.percentage / 100)}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('componentBreakdown').innerHTML = breakdownHtml;
+        }
+
+        function getPropertyComponents(propertyType) {
+            const components = {
+                'office': [
+                    { name: 'Furniture & Equipment', years: 7, percentage: 8, description: 'Built-in desks, cabinets, workstations' },
+                    { name: 'Technology Systems', years: 5, percentage: 5, description: 'Network infrastructure, security systems' },
+                    { name: 'Specialized Lighting', years: 7, percentage: 4, description: 'Task lighting, decorative fixtures' },
+                    { name: 'Landscaping', years: 15, percentage: 6, description: 'Plants, irrigation, outdoor lighting' },
+                    { name: 'Signage', years: 7, percentage: 3, description: 'Exterior and interior signage' }
+                ],
+                'retail': [
+                    { name: 'Display Fixtures', years: 7, percentage: 12, description: 'Built-in shelving, display cases' },
+                    { name: 'Specialized Flooring', years: 5, percentage: 8, description: 'Decorative tile, hardwood' },
+                    { name: 'Storefront', years: 15, percentage: 10, description: 'Windows, doors, entrance features' },
+                    { name: 'Signage', years: 7, percentage: 5, description: 'Exterior and interior signage' }
+                ],
+                'restaurant': [
+                    { name: 'Kitchen Equipment', years: 7, percentage: 20, description: 'Ovens, refrigeration, prep equipment' },
+                    { name: 'Dining Fixtures', years: 7, percentage: 10, description: 'Built-in seating, bars, counters' },
+                    { name: 'Specialized Flooring', years: 5, percentage: 5, description: 'Kitchen flooring, decorative elements' }
+                ]
+            };
+            return components[propertyType] || components['office'];
+        }
+
+        function updateScenarios() {
+            const conservative = analysisData.depreciableBasis * 0.15;
+            const aggressive = analysisData.depreciableBasis * 0.35;
+            
+            const conservativeSavings = conservative * (analysisData.taxRate + analysisData.stateTaxRate) / 100;
+            const aggressiveSavings = aggressive * (analysisData.taxRate + analysisData.stateTaxRate) / 100;
+            
+            document.getElementById('conservativeScenario').innerHTML = `
+                <p class="text-sm text-gray-600 mb-2">Accelerated Components: ${formatCurrency(conservative)}</p>
+                <p class="text-lg font-semibold text-green-600">Tax Savings: ${formatCurrency(conservativeSavings)}</p>
+            `;
+            
+            document.getElementById('aggressiveScenario').innerHTML = `
+                <p class="text-sm text-gray-600 mb-2">Accelerated Components: ${formatCurrency(aggressive)}</p>
+                <p class="text-lg font-semibold text-green-600">Tax Savings: ${formatCurrency(aggressiveSavings)}</p>
+            `;
+        }
+
+        function updateTimeline() {
+            const timelineHtml = `
+                <div class="timeline-item">
+                    <h4 class="font-semibold text-gray-700">Property Acquisition</h4>
+                    <p class="text-sm text-gray-600">Property placed in service: ${analysisData.yearInService}</p>
+                </div>
+                <div class="timeline-item">
+                    <h4 class="font-semibold text-gray-700">Optimal Study Timing</h4>
+                    <p class="text-sm text-gray-600">Within 90 days of acquisition for maximum benefit</p>
+                </div>
+                <div class="timeline-item">
+                    <h4 class="font-semibold text-gray-700">Tax Filing</h4>
+                    <p class="text-sm text-gray-600">Include accelerated depreciation in tax return</p>
+                </div>
+                <div class="timeline-item">
+                    <h4 class="font-semibold text-gray-700">Cash Flow Improvement</h4>
+                    <p class="text-sm text-gray-600">Immediate tax savings improve cash flow</p>
+                </div>
+            `;
+            document.getElementById('timelineAnalysis').innerHTML = timelineHtml;
+        }
+
+        function updateROI() {
+            const studyCost = Math.max(5000, analysisData.depreciableBasis * 0.002);
+            const roi = (analysisData.totalSavings / studyCost * 100).toFixed(0);
+            const paybackMonths = (studyCost / (analysisData.totalSavings / 12)).toFixed(1);
+            
+            const roiHtml = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="metric-card text-center">
+                        <h4 class="font-semibold text-gray-700 mb-2">Estimated Study Cost</h4>
+                        <div class="text-2xl font-bold text-gray-600">${formatCurrency(studyCost)}</div>
+                    </div>
+                    <div class="metric-card text-center">
+                        <h4 class="font-semibold text-gray-700 mb-2">Return on Investment</h4>
+                        <div class="text-2xl font-bold text-green-600">${roi}%</div>
+                    </div>
+                    <div class="metric-card text-center">
+                        <h4 class="font-semibold text-gray-700 mb-2">Payback Period</h4>
+                        <div class="text-2xl font-bold text-blue-600">${paybackMonths} months</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('roiAnalysis').innerHTML = roiHtml;
+        }
+
+        function updateReport() {
+            const propertyTypeNames = {
+                'office': 'Commercial Office Building',
+                'retail': 'Retail Space',
+                'multifamily': 'Multifamily Residential',
+                'warehouse': 'Warehouse/Industrial',
+                'restaurant': 'Restaurant',
+                'hotel': 'Hotel/Hospitality',
+                'medical': 'Medical Office',
+                'manufacturing': 'Manufacturing Facility',
+                'mixed': 'Mixed-Use Development'
+            };
+
+            const propertyName = propertyTypeNames[analysisData.propertyType] || 'Commercial Property';
+            
+            document.getElementById('executiveSummary').innerHTML = `
+                <p class="mb-4">
+                    For your ${propertyName} in ${analysisData.propertyState}, with a purchase price of ${formatCurrency(analysisData.purchasePrice)}, 
+                    you may be eligible for ${formatCurrency(analysisData.firstYearDeduction)} in accelerated depreciation in year one, 
+                    resulting in tax savings of approximately ${formatCurrency(analysisData.totalSavings)}.
+                </p>
+                <p>
+                    The analysis shows that ${((analysisData.fiveSevenYear + analysisData.fifteenYear) / analysisData.depreciableBasis * 100).toFixed(1)}% 
+                    of your depreciable basis qualifies for accelerated depreciation, significantly front-loading your tax benefits.
+                </p>
+            `;
+            
+            document.getElementById('detailedAnalysis').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold mb-2">Property Details</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>Property Type: ${propertyName}</li>
+                            <li>Purchase Price: ${formatCurrency(analysisData.purchasePrice)}</li>
+                            <li>Land Value: ${formatCurrency(analysisData.landValue)}</li>
+                            <li>Depreciable Basis: ${formatCurrency(analysisData.depreciableBasis)}</li>
+                            <li>Year in Service: ${analysisData.yearInService}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2">Component Allocation</h4>
+                        <ul class="text-sm space-y-1">
+                            <li>5/7-Year Property: ${formatCurrency(analysisData.fiveSevenYear)}</li>
+                            <li>15-Year Property: ${formatCurrency(analysisData.fifteenYear)}</li>
+                            <li>39-Year Building: ${formatCurrency(analysisData.thirtyNineYear)}</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('recommendations').innerHTML = `
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                        <span>Proceed with a formal cost segregation study to validate these preliminary findings</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                        <span>Consider timing the study to maximize current year tax benefits</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                        <span>Ensure proper documentation is maintained for IRS compliance</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-600 mt-1 mr-3"></i>
+                        <span>Review state tax implications and potential additional benefits</span>
+                    </li>
+                </ul>
+            `;
+        }
+
+        function updateNextSteps() {
+            // This function can be expanded with more specific next steps based on the analysis
+        }
+
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Initialize with sample data for demonstration
+        window.addEventListener('load', function() {
+            // You can add any initialization code here
+        });
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"960386576d2beac0","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.6.2","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDu6pzmR3opekjMcD47MrsuB7WOJqEmgPwymYlQaHLK7hz7S4QBgztV%2FKSqXV9bwp5dl1CY8oaZmm8%2BGKUgCEch8YK0dk9wVvNQ1yFyF7SkPF0wQzYN5R%2FWpXnlUSmYLRW3Gr4bx3G%2BWWRwgs6mSE5kiuJlgOGXzoi3sfvw78hLTev89qGeTB2w%2BiVQWjG%2BWmxBy5XrfH0McxZ41AEuyFaQwtjD6H10z6T877o%2BmlB71M7iSl9kMdIhEe21TqgYLuIbJ23ruSjgeoz498d0%2B9qOmBDMoFlCYHtHdOV08k0yPB%2FqIPZ2PXZ5WF%2Fqentsm2XByX%2B9QU%2BhVFmsRA%2BgRK5GdPPc%2ByPaToY8Sq9ELi7BGJZkE30ioG7NEFSfOjEP0GWWWKy8jEuV3Jf6JtfUT503Kp06O7aFAzbPygQi16Z5Xja2ws9Hb%2BXznTkhLDjVjRxKZ7V7xIRXYAiBNljdE2B03HG4s6yQrwJ0RV82mHDeg81WyQAF4fziSsMiQjtOz%2F1dNg6QisJx5yYdxGJx5kc7Q%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDu6pzmR3opekjMcD47MrsuB7WOJqEmgPwymYlQaHLK7hz7S4QBgztV/KSqXV9bwp5dl1CY8oaZmm8+GKUgCEch8YK0dk9wVvNQ1yFyF7SkPF0wQzYN5R/WpXnlUSmYLRW3Gr4bx3G+WWRwgs6mSE5kiuJlgOGXzoi3sfvw78hLTev89qGeTB2w+iVQWjG+WmxBy5XrfH0McxZ41AEuyFaQwtjD6H10z6T877o+mlB71M7iSl9kMdIhEe21TqgYLuIbJ23ruSjgeoz498d0+9qOmBDMoFlCYHtHdOV08k0yPB/qIPZ2PXZ5WF/qentsm2XByX+9QU+hVFmsRA+gRK5GdPPc+yPaToY8Sq9ELi7BGJZkE30ioG7NEFSfOjEP0GWWWKy8jEuV3Jf6JtfUT503Kp06O7aFAzbPygQi16Z5Xja2ws9Hb+XznTkhLDjVjRxKZ7V7xIRXYAiBNljdE2B03HG4s6yQrwJ0RV82mHDeg81WyQAF4fziSsMiQjtOz/1dNg6QisJx5yYdxGJx5kc7Q=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
